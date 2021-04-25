@@ -1,7 +1,7 @@
 import { createRequire } from "module"
 import { v4 as uuid } from "@lukeed/uuid"
 import type { GetContext, Handle } from "@sveltejs/kit"
-// import cookie from "cookie"
+import cookie from "cookie"
 
 // const cookie = createRequire(import.meta.url)("cookie")
 

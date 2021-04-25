@@ -1,24 +1,27 @@
 <script context="module" lang="ts">
-  import type { Load } from "@sveltejs/kit"
   import { dev } from "$app/env"
 
   export const hydrate = dev
   export const prerender = true
-
-  export const load: Load = async ({ fetch, page: { query } }) => {
-    const code = query.get("code")
-
-    const response = await fetch(`http://localhost:3001/truelayer/authorize?code=${code}`)
-
-    const json = await response.json()
-    if (!response.ok) console.error(`Failed`, json)
-
-    return {
-      props: { code },
-      status: 302,
-      redirect: "/accounts"
-    }
-  }
 </script>
 
-<pre>{JSON.stringify($$props,null, 2)}</pre>
+<script lang="ts">
+  import { goto } from "$app/navigation"
+  import { onMount } from "svelte"
+
+  let error: string = ""
+
+  onMount(async () => {
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get("code")
+
+    const response = await fetch(`http://localhost:3001/truelayer/authorize?code=${code}`, {
+      credentials: "include"
+    })
+
+    if (response.ok) goto("/")
+    else error = "An error occurred when authorizing with Ynab"
+  })
+</script>
+
+<div>{JSON.stringify($$props)}</div>

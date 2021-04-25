@@ -1,15 +1,18 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@bundled-es-modules/axios': ^0.21.1
   '@fontsource/fira-mono': ^4.2.2
   '@lukeed/uuid': ^2.0.0
   '@sveltejs/adapter-node': next
   '@sveltejs/kit': next
+  '@types/axios': ^0.14.0
+  '@types/cookie': ^0.4.0
   '@types/mongodb': ^3.6.12
+  '@types/redis': ^2.8.28
   '@typescript-eslint/eslint-plugin': ^4.19.0
   '@typescript-eslint/parser': ^4.19.0
   autoprefixer: ^10.2.5
-  axios: ^0.21.1
   cookie: ^0.4.1
   cssnano: ^5.0.1
   eslint: ^7.22.0
@@ -21,6 +24,7 @@ specifiers:
   postcss-load-config: ^3.0.1
   prettier: ~2.2.1
   prettier-plugin-svelte: ^2.2.0
+  redis: ^3.1.2
   svelte: ^3.29.0
   svelte-preprocess: ^4.0.0
   tailwindcss: ^2.1.1
@@ -30,17 +34,21 @@ specifiers:
   vite: ^2.1.0
 
 dependencies:
+  '@bundled-es-modules/axios': 0.21.1
   '@fontsource/fira-mono': 4.2.2
   '@lukeed/uuid': 2.0.0
-  axios: 0.21.1
+  '@types/cookie': 0.4.0
   cookie: 0.4.1
   mongodb: 3.6.6
   openid-client: 4.7.2
+  redis: 3.1.2
 
 devDependencies:
   '@sveltejs/adapter-node': 1.0.0-next.16
-  '@sveltejs/kit': 1.0.0-next.87_svelte@3.37.0+vite@2.2.1
+  '@sveltejs/kit': 1.0.0-next.88_svelte@3.37.0+vite@2.2.1
+  '@types/axios': 0.14.0
   '@types/mongodb': 3.6.12
+  '@types/redis': 2.8.28
   '@typescript-eslint/eslint-plugin': 4.22.0_9acede93a3623dd7abe65c65a7010e73
   '@typescript-eslint/parser': 4.22.0_eslint@7.24.0+typescript@4.2.4
   autoprefixer: 10.2.5_postcss@8.2.12
@@ -85,6 +93,10 @@ packages:
       chalk: 2.4.2
       js-tokens: 4.0.0
     dev: true
+
+  /@bundled-es-modules/axios/0.21.1:
+    resolution: {integrity: sha512-jlHdEagempZTRIy7KgR1FACLS7sO0QTZhM+6G7xd9kIs/9rzU77d2R2NqxiVFArjjrt2MX6nOP/GvR7+8SWJpQ==}
+    dev: false
 
   /@eslint/eslintrc/0.4.0:
     resolution: {integrity: sha512-2ZPCc+uNbjV5ERJr+aKSPRwZgKd2z11x0EgLvb1PURmUrn9QNRXFqje0Ldq454PfAVyaJYyrDvvIKSFP4NnBog==}
@@ -170,8 +182,8 @@ packages:
     resolution: {integrity: sha512-XXZtiyX8dT1shmiKF2DwB2mCrMrUzFVRItYAV0B3BFF+U5775hpNS5krgtZnJdbA1AoW0Ay2OT+u6MKeQ5/KUQ==}
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.87_svelte@3.37.0+vite@2.2.1:
-    resolution: {integrity: sha512-63plwv3ikGnCol/HEf3vRkjx2AeShYC39IRI9+BVJjNzb7CqVOUU9AMuOIBG1b7AmhPJzPbtkf33HDs33I27yg==}
+  /@sveltejs/kit/1.0.0-next.88_svelte@3.37.0+vite@2.2.1:
+    resolution: {integrity: sha512-4N+c0IyI8WOlhWA0cDb7EJwEHcfxUqjdJGyBYjRMx9VZ5Fe4RAul4cDl+iQ4JO2kbWSltprwBYs39WwOsvMBbQ==}
     engines: {node: '>= 12.17.0'}
     hasBin: true
     peerDependencies:
@@ -222,6 +234,15 @@ packages:
     engines: {node: '>=10.13.0'}
     dev: true
 
+  /@types/axios/0.14.0:
+    resolution: {integrity: sha1-7CMA++fX3d1+udOr+HmZlkyvzkY=}
+    deprecated: This is a stub types definition for axios (https://github.com/mzabriskie/axios). axios provides its own type definitions, so you don't need @types/axios installed!
+    dependencies:
+      axios: 0.21.1
+    transitivePeerDependencies:
+      - debug
+    dev: true
+
   /@types/bson/4.0.3:
     resolution: {integrity: sha512-mVRvYnTOZJz3ccpxhr3wgxVmSeiYinW+zlzQz3SXWaJmD1DuL05Jeq7nKw3SnbKmbleW5qrLG5vdyWe/A9sXhw==}
     dependencies:
@@ -235,6 +256,10 @@ packages:
       '@types/keyv': 3.1.1
       '@types/node': 14.14.41
       '@types/responselike': 1.0.0
+    dev: false
+
+  /@types/cookie/0.4.0:
+    resolution: {integrity: sha512-y7mImlc/rNkvCRmg8gC3/lj87S7pTUIJ6QGjwHR9WQJcFs+ZMTOaoPrkdFA/YdbuqVEmEbb5RdhVxMkAcgOnpg==}
     dev: false
 
   /@types/http-cache-semantics/4.0.0:
@@ -267,6 +292,12 @@ packages:
 
   /@types/pug/2.0.4:
     resolution: {integrity: sha1-h3L80EGOPNLMFxVV1zAHQVBR9LI=}
+    dev: true
+
+  /@types/redis/2.8.28:
+    resolution: {integrity: sha512-8l2gr2OQ969ypa7hFOeKqtFoY70XkHxISV0pAwmQ2nm6CSPb1brmTmqJCGGrekCo+pAZyWlNXr+Kvo6L/1wijA==}
+    dependencies:
+      '@types/node': 14.14.41
     dev: true
 
   /@types/responselike/1.0.0:
@@ -523,7 +554,7 @@ packages:
       follow-redirects: 1.13.3
     transitivePeerDependencies:
       - debug
-    dev: false
+    dev: true
 
   /balanced-match/1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -1259,7 +1290,7 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-    dev: false
+    dev: true
 
   /fraction.js/4.0.13:
     resolution: {integrity: sha512-E1fz2Xs9ltlUp+qbiyx9wmt2n9dRzPsS11Jtdb8D2o+cC7wr9xkkKsVKJuBX0ST+LVS+LhLO+SbLJNtfWcJvXA==}
@@ -2421,6 +2452,32 @@ packages:
     dependencies:
       picomatch: 2.2.3
     dev: true
+
+  /redis-commands/1.7.0:
+    resolution: {integrity: sha512-nJWqw3bTFy21hX/CPKHth6sfhZbdiHP6bTawSgQBlKOVRG7EZkfHbbHwQJnrE4vsQf0CMNE+3gJ4Fmm16vdVlQ==}
+    dev: false
+
+  /redis-errors/1.2.0:
+    resolution: {integrity: sha1-62LSrbFeTq9GEMBK/hUpOEJQq60=}
+    engines: {node: '>=4'}
+    dev: false
+
+  /redis-parser/3.0.0:
+    resolution: {integrity: sha1-tm2CjNyv5rS4pCin3vTGvKwxyLQ=}
+    engines: {node: '>=4'}
+    dependencies:
+      redis-errors: 1.2.0
+    dev: false
+
+  /redis/3.1.2:
+    resolution: {integrity: sha512-grn5KoZLr/qrRQVwoSkmzdbw6pwF+/rwODtrOr6vuBRiR/f3rjSTGupbF90Zpqm2oenix8Do6RV7pYEkGwlKkw==}
+    engines: {node: '>=10'}
+    dependencies:
+      denque: 1.5.0
+      redis-commands: 1.7.0
+      redis-errors: 1.2.0
+      redis-parser: 3.0.0
+    dev: false
 
   /reduce-css-calc/2.1.8:
     resolution: {integrity: sha512-8liAVezDmUcH+tdzoEGrhfbGcP7nOV4NkGE3a74+qqvE7nt9i4sKLGBuZNOnpI4WiGksiNPklZxva80061QiPg==}

@@ -11,7 +11,9 @@
   "devDependencies": {
     "@sveltejs/adapter-node": "next",
     "@sveltejs/kit": "next",
+    "@types/axios": "^0.14.0",
     "@types/mongodb": "^3.6.12",
+    "@types/redis": "^2.8.28",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
     "autoprefixer": "^10.2.5",
@@ -33,11 +35,13 @@
   },
   "type": "module",
   "dependencies": {
+    "@bundled-es-modules/axios": "^0.21.1",
     "@fontsource/fira-mono": "^4.2.2",
     "@lukeed/uuid": "^2.0.0",
-    "axios": "^0.21.1",
+    "@types/cookie": "^0.4.0",
     "cookie": "^0.4.1",
     "mongodb": "^3.6.6",
-    "openid-client": "^4.6.0"
+    "openid-client": "^4.6.0",
+    "redis": "^3.1.2"
   }
 }

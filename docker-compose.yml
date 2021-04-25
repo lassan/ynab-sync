@@ -14,3 +14,10 @@ services:
     container_name: mongo-express
     ports:
       - 8081:8081
+    restart: unless-stopped
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+    restart: unless-stopped

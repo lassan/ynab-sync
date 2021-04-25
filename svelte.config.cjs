@@ -20,6 +20,7 @@ module.exports = {
 		target: '#svelte',
 
 		vite: {
+			optimizeDeps: ["axios", "cookie"],
 			ssr: {
 				noExternal: Object.keys(pkg.dependencies || {})
 			}

@@ -1,0 +1,106 @@
+{
+    "ynab": [
+        {
+            "id": "763965df-cab4-4d76-b928-07cf3b355071",
+            "name": "Test Account A",
+            "type": "checking",
+            "on_budget": true,
+            "closed": false,
+            "note": null,
+            "balance": 0,
+            "cleared_balance": 0,
+            "uncleared_balance": 0,
+            "transfer_payee_id": "af478712-1284-46aa-aacf-1a04e10e57ee",
+            "direct_import_linked": false,
+            "direct_import_in_error": false,
+            "deleted": false
+        }
+    ],
+    "banking": [
+        {
+            "update_timestamp": "2021-04-24T23:45:04.3015231Z",
+            "account_id": "56c7b029e0f8ec5a2334fb0ffc2fface",
+            "account_type": "TRANSACTION",
+            "display_name": "TRANSACTION ACCOUNT 1",
+            "currency": "GBP",
+            "account_number": {
+                "swift_bic": "CPBKGB00",
+                "number": "10000000",
+                "sort_code": "01-21-31"
+            },
+            "provider": {
+                "display_name": "MOCK",
+                "provider_id": "mock",
+                "logo_uri": "https://truelayer-client-logos.s3-eu-west-1.amazonaws.com/banks/banks-icons/mock-icon.svg"
+            }
+        },
+        {
+            "update_timestamp": "2021-04-24T23:45:04.3015331Z",
+            "account_id": "3c6edb9484ecd581dc1cedde8bedb1f1",
+            "account_type": "SAVINGS",
+            "display_name": "SAVINGS ACCOUNT 1",
+            "currency": "GBP",
+            "account_number": {
+                "swift_bic": "CPBKGB00",
+                "number": "20000000",
+                "sort_code": "01-21-31"
+            },
+            "provider": {
+                "display_name": "MOCK",
+                "provider_id": "mock",
+                "logo_uri": "https://truelayer-client-logos.s3-eu-west-1.amazonaws.com/banks/banks-icons/mock-icon.svg"
+            }
+        },
+        {
+            "update_timestamp": "2021-04-24T23:45:04.3015422Z",
+            "account_id": "89c3139784a055b9b47998f9dce9122e",
+            "account_type": "TRANSACTION",
+            "display_name": "TRANSACTION ACCOUNT 2",
+            "currency": "GBP",
+            "account_number": {
+                "swift_bic": "CPBKGB00",
+                "number": "30000000",
+                "sort_code": "01-21-31"
+            },
+            "provider": {
+                "display_name": "MOCK",
+                "provider_id": "mock",
+                "logo_uri": "https://truelayer-client-logos.s3-eu-west-1.amazonaws.com/banks/banks-icons/mock-icon.svg"
+            }
+        },
+        {
+            "update_timestamp": "2021-04-24T23:45:04.3015494Z",
+            "account_id": "328df3a40b828340fa4c3100e17de121",
+            "account_type": "SAVINGS",
+            "display_name": "SAVINGS ACCOUNT 2",
+            "currency": "GBP",
+            "account_number": {
+                "swift_bic": "CPBKGB00",
+                "number": "40000000",
+                "sort_code": "01-21-31"
+            },
+            "provider": {
+                "display_name": "MOCK",
+                "provider_id": "mock",
+                "logo_uri": "https://truelayer-client-logos.s3-eu-west-1.amazonaws.com/banks/banks-icons/mock-icon.svg"
+            }
+        },
+        {
+            "update_timestamp": "2021-04-24T23:45:04.3015563Z",
+            "account_id": "8de2de9eab01b935b21abcbed11adf26",
+            "account_type": "TRANSACTION",
+            "display_name": "TRANSACTION ACCOUNT 3",
+            "currency": "GBP",
+            "account_number": {
+                "swift_bic": "CPBKGB00",
+                "number": "50000000",
+                "sort_code": "01-21-31"
+            },
+            "provider": {
+                "display_name": "MOCK",
+                "provider_id": "mock",
+                "logo_uri": "https://truelayer-client-logos.s3-eu-west-1.amazonaws.com/banks/banks-icons/mock-icon.svg"
+            }
+        }
+    ]
+}
