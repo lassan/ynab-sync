@@ -1,0 +1,32 @@
+{
+  "name": "mongodb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cookie": "^0.4.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "fp-ts": "^2.10.5",
+    "mongodb": "3.6.8",
+    "morgan": "^1.10.0",
+    "openid-client": "^4.7.3",
+    "redis": "^3.1.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.10",
+    "@types/express": "^4.17.11",
+    "@types/mongodb": "3.6.16",
+    "@types/morgan": "^1.9.2",
+    "@types/redis": "^2.8.28",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  }
+}
