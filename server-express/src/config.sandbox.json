@@ -1,0 +1,9 @@
+{
+    "truelayer": {
+        "client_id": "sandbox-ynabsync-52b117",
+        "client_secret": "28e0911c-6a7e-4153-b7bf-7bf0a303a9d0",
+        "auth_url": "https://auth.truelayer-sandbox.com",
+        "base_url": "https://api.truelayer-sandbox.com/data/v1",
+        "redirect_url": "http://localhost:3000/truelayer-redirect"
+    }
+}

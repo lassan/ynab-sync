@@ -16,7 +16,7 @@
     const params = new URLSearchParams(window.location.search)
     const code = params.get("code")
 
-    const response = await fetch(`http://localhost:3001/ynab/authorize?code=${code}`)
+    const response = await fetch(`/ynab/authorize?code=${code}`)
     if (response.ok) goto("/")
     if (!response.ok) error = "An error occurred when authorizing with Ynab"
   })

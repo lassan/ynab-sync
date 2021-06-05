@@ -1,10 +1,8 @@
 import mongodb, { FilterQuery, UpdateQuery } from "mongodb"
 import assert from "assert"
 
-import type { UserDocument } from "../../libs/src/types"
+import type { UserDocument, YnabToBankConnection } from "./types"
 import { promisify } from "util"
-
-import { TaskEither, tryCatch } from "fp-ts/TaskEither"
 
 const { MongoClient } = mongodb
 const url = "mongodb://localhost:27017"
@@ -15,7 +13,7 @@ const connection = new Promise<mongodb.Db>((resolve, reject) => {
   client.connect((err) => {
     assert.strictEqual(err, null)
 
-    console.log("Connected successfully to the server")
+    console.log("Connected successfully to the database server")
 
     resolve(client.db(dbName))
   })
@@ -34,12 +32,36 @@ const upsert = async (userId: string, update: UpdateQuery<UserDocument>) => {
 
   const db = await connection
   const collection = db.collection("data")
+
   collection.updateOne({ userId }, update, { upsert: true }, (err, result) => {
     if (err) throw err
 
     console.info(`Upserted ${result.result.n} documents into the collection`)
   })
 }
+
+const updateConnection = async (userId: string, update: YnabToBankConnection) => {
+  const db = await connection
+  const collection = db.collection<UserDocument>("data")
+
+  collection.updateOne(
+    {
+      $and: [{ userId }, { "connections.id": update.connection_id }]
+    },
+    {
+      $set: {
+        [`connections.$.accounts.${update.bank_account_id}.connected_at`]: new Date(),
+        [`connections.$.accounts.${update.bank_account_id}.connected_to`]: update.ynab_account_id
+      }
+    },
+    (err, result) => {
+      if (err) throw err
+
+      console.info(`Upserted ${result.result.n} documents into the collection`)
+    }
+  )
+}
+
 const findDocument = async (userId: string) => {
   console.debug("[mongodb] Fetching document")
   const db = await connection
@@ -54,4 +76,4 @@ const findDocument = async (userId: string) => {
 
 const close = () => connection.then(() => client.close())
 
-export { findDocument, upsert, close }
+export { findDocument, upsert, close, connection, updateConnection }

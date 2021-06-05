@@ -1,0 +1,9 @@
+{
+    "truelayer": {
+        "client_id": "ynabsync-52b117",
+        "client_secret": "99a9f950-041a-457d-835b-987057c3299f",
+        "auth_url": "https://auth.truelayer.com",
+        "base_url": "https://api.truelayer.com/data/v1",
+        "redirect_url": "http://localhost:3000/truelayer-redirect"
+    }
+}

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "module": "ESNext",
+    "module": "commonjs",
     "lib": ["es2020"],
     "target": "ESNext",
     "importsNotUsedAsValues": "error",
