@@ -33,7 +33,7 @@ const upsert = async (userId: string, update: UpdateQuery<UserDocument>) => {
   const db = await connection
   const collection = db.collection("data")
 
-  collection.updateOne({ userId }, update, { upsert: true }, (err, result) => {
+  collection.updateOne({ user_id: userId }, update, { upsert: true }, (err, result) => {
     if (err) throw err
 
     console.info(`Upserted ${result.result.n} documents into the collection`)
@@ -46,7 +46,7 @@ const updateConnection = async (userId: string, update: YnabToBankConnection) =>
 
   collection.updateOne(
     {
-      $and: [{ userId }, { "connections.id": update.connection_id }]
+      $and: [{ user_id: userId }, { "connections.id": update.connection_id }]
     },
     {
       $set: {
@@ -68,7 +68,7 @@ const findDocument = async (userId: string) => {
   const collection = db.collection("data")
 
   const filter: FilterQuery<UserDocument> = {
-    userId: userId
+    user_id: userId
   }
 
   return await collection.findOne<UserDocument>(filter)

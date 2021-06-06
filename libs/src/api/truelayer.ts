@@ -47,6 +47,7 @@ type Transaction = Readonly<{
   transaction_category: string
   transaction_classification: string[]
   merchant_name: string
+  meta: { provider_merchant_name: string }
   amount: number
   currency: string
 }>

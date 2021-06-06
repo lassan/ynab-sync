@@ -1,12 +1,15 @@
 import type { AuthDetails } from "../types"
 import { Issuer, TokenSet } from "openid-client"
 
-export type OAuthConfig = {
-  readonly client_id: string
-  readonly client_secret: string
-  readonly auth_url: string
-  readonly redirect_url: string
-}
+export type OAuthConfig = Readonly<{
+  discovery?: boolean
+  authorization_endpoint?: string
+  token_endpoint?: string
+  client_id: string
+  client_secret: string
+  auth_url: string
+  redirect_url: string
+}>
 
 export interface AuthClient {
   authorize: (authCode: string) => Promise<AuthDetails>
@@ -16,9 +19,19 @@ export interface AuthClient {
 export type RefreshToken = AuthClient["refreshToken"]
 
 export const createAuthClient = async (config: OAuthConfig): Promise<AuthClient> => {
-  const client = await Issuer.discover(config.auth_url).then(
-    (issuer) =>
-      new issuer.Client({
+  const issuer = config.discovery
+    ? Issuer.discover(config.auth_url)
+    : Promise.resolve(
+        new Issuer({
+          issuer: "issuer",
+          authorization_endpoint: `${config.auth_url}${config.authorization_endpoint}}`,
+          token_endpoint: `${config.auth_url}${config.token_endpoint}`
+        })
+      )
+
+  const client = await issuer.then(
+    (is) =>
+      new is.Client({
         client_id: config.client_id,
         client_secret: config.client_secret,
         redirect_uris: [config.redirect_url],

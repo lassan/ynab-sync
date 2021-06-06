@@ -3,10 +3,9 @@ import { Issuer } from "openid-client"
 import axios from "axios"
 
 import * as redis from "../redis"
-import type { YnabTransaction, YnabAccount } from "../../../libs/src/types"
-import * as db from "../../../libs/src/db"
-
-import { getTokenFn } from "../getTokenFn"
+import type { YnabTransaction, YnabAccount } from "../types"
+import { authHeader, requestLogger } from "../axios/interceptors"
+import * as db from "../db"
 
 const client = new new Issuer({
   issuer: "ynab",
@@ -59,7 +58,7 @@ type Error = Readonly<{
 }>
 
 type UserResponse = Readonly<{
-  user: { id: string; name: string; detail: string }
+  user: { id: string }
 }>
 
 export type AccountResponse = Readonly<{
@@ -70,41 +69,29 @@ export type TransactionsRequest = Readonly<{
   transactions: YnabTransaction[]
 }>
 
-const getUpdatedToken = (user_id: string, service: string) => {
-  const key = `${user_id}:${service}`
-
-  return getTokenFn(
-    `${user_id}:ynab`,
-    async () => {
-      const token = await db.findDocument(user_id).then((doc) => doc.ynab_refresh_token)
-      return await refreshToken(token)
-    },
-    (refresh_token) => db.upsert(user_id, { $set: { ynab_refresh_token: refresh_token } })
-  )()
+const getUpdatedToken = async (userId: string, service: string) => {
+  const key = `${userId}:${service}`
+  const token = await redis.get(key)
+  if (token) return token
+  else {
+    console.log("[ynab] Updating access token")
+    const token = await db.findDocument(userId).then((doc) => doc.ynab_refresh_token)
+    const { access_token, refresh_token, expires_in } = await refreshToken(token)
+    redis.set(key, access_token, expires_in)
+    db.upsert(userId, {
+      $set: { ynabAuth: { refresh_token } }
+    })
+    return access_token
+  }
 }
 
-const user = (accessToken: string) =>
-  axios
-    .get<Response<UserResponse>>("https://api.youneedabudget.com/v1/user", {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    })
-    .then((r) => r.data.data.user)
-
-const api = (userId: string) => {
+const api = (getAccessToken: () => Promise<string>) => {
   const client = axios.create({
     baseURL: "https://api.youneedabudget.com/v1"
   })
 
-  client.interceptors.request.use((request) => {
-    console.log(`axios ${request.method} /${request.url}`)
-    return request
-  })
-
-  client.interceptors.request.use(async (config) => {
-    const accessToken = await getUpdatedToken(userId, "ynab")
-    config.headers["Authorization"] = `Bearer ${accessToken}`
-    return config
-  })
+  client.interceptors.request.use(authHeader(getAccessToken))
+  client.interceptors.request.use(requestLogger)
 
   const user = () => client.get<Response<UserResponse>>("user").then((r) => r.data.data.user)
 
@@ -119,4 +106,4 @@ const api = (userId: string) => {
   return { user, accounts, transactions }
 }
 
-export { authorize, api, user }
+export { authorize, api }

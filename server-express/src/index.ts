@@ -1,5 +1,5 @@
 import express from "express"
-import morgan, { token } from "morgan"
+import morgan from "morgan"
 import cors from "cors"
 import cookie from "cookie"
 
@@ -7,19 +7,18 @@ import type { Request } from "express"
 
 import * as ynab from "./api/ynab"
 
-import { pipe } from "fp-ts/function"
-
 import type { UserDocument, YnabToBankConnection } from "../../libs/src/types"
 import { upsert, findDocument, updateConnection } from "../../libs/src/db"
-import { accountsResource, api as createTruelayerApi } from "../../libs/src/api/truelayer"
+import { api as createTruelayerApi } from "../../libs/src/api/truelayer"
 
 import { createAuthClient } from "../../libs/src/api/createAuthClient"
 
-import * as config from "./config.prod.json"
+import { config } from "./config"
 import { v4 as uuid } from "uuid"
 import dayjs from "dayjs"
 
 const truelayerAuth = createAuthClient(config.truelayer)
+const ynabAuth = createAuthClient(config.ynab)
 
 const app = express()
 
@@ -40,9 +39,10 @@ app.get("/ynab/authorize", async (req, res) => {
   const tokens = await ynab.authorize(code)
   const user = await ynab.user(tokens.access_token)
 
+  console.log(user)
   upsert(user.id, {
     $set: {
-      userId: user.id,
+      user_id: user.id,
       ynab_refresh_token: tokens.refresh_token
     }
   })

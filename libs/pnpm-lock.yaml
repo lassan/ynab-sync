@@ -4,6 +4,7 @@ specifiers:
   '@types/mongodb': ^3.6.17
   '@types/redis': ^2.8.29
   axios: ^0.21.1
+  dayjs: ^1.10.5
   mongodb: ^3.6.9
   openid-client: ^4.7.4
   redis: ^3.1.2
@@ -11,6 +12,7 @@ specifiers:
 dependencies:
   '@types/mongodb': 3.6.17
   axios: 0.21.1
+  dayjs: 1.10.5
   openid-client: 4.7.4
   redis: 3.1.2
 
@@ -144,6 +146,10 @@ packages:
   /core-util-is/1.0.2:
     resolution: {integrity: sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=}
     dev: true
+
+  /dayjs/1.10.5:
+    resolution: {integrity: sha512-BUFis41ikLz+65iH6LHQCDm4YPMj5r1YFLdupPIyM4SGcXMmtiLQ7U37i+hGS8urIuqe7I/ou3IS1jVc4nbN4g==}
+    dev: false
 
   /decompress-response/6.0.0:
     resolution: {integrity: sha512-aW35yZM6Bb/4oJlZncMH2LCoZtJXTRxES17vE3hoRiowU2kWHaJKFkSBDnDR+cm9J+9QhXmREyIfv0pji9ejCQ==}
