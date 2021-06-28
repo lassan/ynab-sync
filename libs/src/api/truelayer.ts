@@ -40,7 +40,7 @@ const getCachedToken = (key: string) => redis.get(key)
 //   }
 // }
 
-type Transaction = Readonly<{
+export type Transaction = Readonly<{
   timestamp: Date
   description: string
   transaction_type: string

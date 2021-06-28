@@ -63,6 +63,12 @@ const run = async () => {
               ? truelayerApi.cards.transactions(account.id, fromDate, toDate)
               : truelayerApi.accounts.transactions(account.id, fromDate, toDate)
 
+          const payee = (tr: truelayer.Transaction) =>
+            (tr.merchant_name ?? tr.meta?.provider_merchant_name ?? tr.description ?? "").slice(
+              0,
+              99
+            )
+
           const transactions = await transactionsApi.then((trs) =>
             trs.map(
               (tr) =>
@@ -70,7 +76,7 @@ const run = async () => {
                   account_id: account.connected_to,
                   amount: Math.round(tr.amount * 1000) * (account.type == "card" ? -1 : 1),
                   cleared: "cleared",
-                  payee_name: tr.merchant_name ?? tr.meta?.provider_merchant_name ?? tr.description,
+                  payee_name: payee(tr),
                   date: tr.timestamp
                 } as YnabTransaction)
             )
