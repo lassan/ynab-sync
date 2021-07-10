@@ -9,6 +9,7 @@ specifiers:
   '@types/uuid': 8.3.1
   axios: ^0.21.1
   cookie: ^0.4.1
+  cookie-parser: ^1.4.5
   cors: ^2.8.5
   dayjs: 1.10.6
   express: ^4.17.1
@@ -25,6 +26,7 @@ specifiers:
 dependencies:
   axios: 0.21.1
   cookie: 0.4.1
+  cookie-parser: 1.4.5
   cors: 2.8.5
   dayjs: 1.10.6
   express: 4.17.1
@@ -311,6 +313,14 @@ packages:
   /content-type/1.0.4:
     resolution: {integrity: sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==}
     engines: {node: '>= 0.6'}
+    dev: false
+
+  /cookie-parser/1.4.5:
+    resolution: {integrity: sha512-f13bPUj/gG/5mDr+xLmSxxDsB9DQiTIfhJS/sqjrmfAWiAN+x2O4i/XguTL9yDZ+/IFDanJ+5x7hC4CXT9Tdzw==}
+    engines: {node: '>= 0.8.0'}
+    dependencies:
+      cookie: 0.4.0
+      cookie-signature: 1.0.6
     dev: false
 
   /cookie-signature/1.0.6:

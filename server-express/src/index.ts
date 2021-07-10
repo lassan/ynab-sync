@@ -2,6 +2,7 @@ import express from "express"
 import morgan from "morgan"
 import cors from "cors"
 import cookie from "cookie"
+import cookieParser from "cookie-parser"
 
 import type { Request } from "express"
 
@@ -30,6 +31,7 @@ app.use(
     credentials: true,
     optionsSuccessStatus: 200
   }),
+  cookieParser(),
   express.json()
 )
 
@@ -48,7 +50,7 @@ app.get("/ynab/authorize", async (req, res) => {
       ynab_refresh_token: tokens.refresh_token
     }
   })
-    .then(() => res.json({ userId: user.id }))
+    .then(() => res.cookie("userId", user.id, { httpOnly: true }).json({ userId: user.id }))
     .catch((err) => res.status(500).json({ err: err.message }))
 })
 

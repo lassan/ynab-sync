@@ -4,10 +4,15 @@
   export const hydrate = dev
   export const prerender = true
 
+  export async function load({ page, fetch }) {
+    const res = await fetch("/accounts.json", { credentials: "include" })
+    if (res.ok) {
+      return { props: { accounts: await res.json() } }
+    }
+  }
 </script>
 
 <script lang="ts">
-  import { onMount } from "svelte"
   import AccountSyncConfiguration from "$lib/AccountSyncConfiguration.svelte"
   import type { Connection, YnabAccount, YnabToBankConnection } from "../../../../libs/src/types"
 
@@ -15,14 +20,8 @@
     throw new Error(msg)
   }
 
-  let accounts: { ynab: YnabAccount[]; connections: Connection[] } = { ynab: [], connections: [] }
+  export let accounts: { ynab: YnabAccount[]; connections: Connection[] }
   let saveMapping: Promise<void>
-
-  onMount(async () => {
-    const response = await fetch("/accounts.json", { credentials: "include" })
-    accounts = await response.json()
-    if (!response.ok) console.error(`Failed`, accounts)
-  })
 
   const onSelected = (event: CustomEvent<YnabToBankConnection>) => {
     console.log("detail", event.detail)
@@ -33,9 +32,13 @@
         "Content-Type": "application/json"
       },
       body: JSON.stringify(event.detail)
-    }).then((r) => (r.ok ? void {} : _throw("")))
+    })
+      .then((r) => (r.ok ? void {} : _throw("")))
+      .then(() => fetch("/accounts.json", { credentials: "include" }))
+      .then(async (res) =>
+        res.ok ? (accounts = await res.json()) : _throw("Failed to refresh accounts")
+      )
   }
-
 </script>
 
 <svelte:head>
