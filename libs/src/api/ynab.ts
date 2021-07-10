@@ -69,22 +69,6 @@ export type TransactionsRequest = Readonly<{
   transactions: YnabTransaction[]
 }>
 
-const getUpdatedToken = async (userId: string, service: string) => {
-  const key = `${userId}:${service}`
-  const token = await redis.get(key)
-  if (token) return token
-  else {
-    console.log("[ynab] Updating access token")
-    const token = await db.findDocument(userId).then((doc) => doc.ynab_refresh_token)
-    const { access_token, refresh_token, expires_in } = await refreshToken(token)
-    redis.set(key, access_token, expires_in)
-    db.upsert(userId, {
-      $set: { ynabAuth: { refresh_token } }
-    })
-    return access_token
-  }
-}
-
 const api = (getAccessToken: () => Promise<string>) => {
   const client = axios.create({
     baseURL: "https://api.youneedabudget.com/v1"

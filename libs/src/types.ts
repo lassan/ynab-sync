@@ -61,5 +61,5 @@ export type YnabTransaction = Readonly<{
   amount: number
   payee_name: string
   cleared: "cleared" | "uncleared" | "reconciled"
-  memo: string
+  memo?: string
 }>
