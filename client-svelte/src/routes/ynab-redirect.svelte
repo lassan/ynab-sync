@@ -3,24 +3,23 @@
 
   export const hydrate = dev
   export const prerender = true
+
+  export async function load({ page, fetch }) {
+    const code = page.query.get("code")
+    const res = await fetch(`http://localhost:3001/ynab/authorize?code=${code}`, {
+      credentials: "include"
+    })
+
+    if (res.ok) {
+      return { redirect: "/", status: 307 }
+    } else {
+      return { props: { error: "An error occurred when authorizing with Ynab" } }
+    }
+  }
 </script>
 
 <script lang="ts">
-  import { goto } from "$app/navigation"
-  import { onMount } from "svelte"
-
-  let error: string = ""
-
-  onMount(async () => {
-    const params = new URLSearchParams(window.location.search)
-    const code = params.get("code")
-
-    const response = await fetch(`http://localhost:3001/ynab/authorize?code=${code}`, {
-      credentials: "include"
-    })
-    if (response.ok) goto("/")
-    if (!response.ok) error = "An error occurred when authorizing with Ynab"
-  })
+  export let error: string
 </script>
 
 <div>{error}</div>
