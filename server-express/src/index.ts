@@ -5,17 +5,18 @@ import cookie from "cookie"
 
 import type { Request } from "express"
 
-import * as ynab from "./api/ynab"
+import * as ynab from "../../libs/src/api/ynab"
 
 import type { UserDocument, YnabToBankConnection } from "../../libs/src/types"
 import { upsert, findDocument, updateConnection } from "../../libs/src/db"
 import { api as createTruelayerApi } from "../../libs/src/api/truelayer"
 
-import { createAuthClient } from "../../libs/src/api/createAuthClient"
+import { AuthClient, createAuthClient } from "../../libs/src/api/createAuthClient"
 
 import { config } from "./config"
 import { v4 as uuid } from "uuid"
 import dayjs from "dayjs"
+import { getTokenFn } from "./getTokenFn"
 
 const truelayerAuth = createAuthClient(config.truelayer)
 const ynabAuth = createAuthClient(config.ynab)
@@ -36,8 +37,9 @@ app.get("/ynab/authorize", async (req, res) => {
   const code = req.query["code"] as string
 
   if (!code) return res.status(400).json({ error: "Code is missing" })
-  const tokens = await ynab.authorize(code)
-  const user = await ynab.user(tokens.access_token)
+  const tokens = await (await ynabAuth).authorize(code)
+  const api = ynab.api(() => Promise.resolve(tokens.access_token))
+  const user = await api.user()
 
   console.log(user)
   upsert(user.id, {
@@ -50,13 +52,16 @@ app.get("/ynab/authorize", async (req, res) => {
     .catch((err) => res.status(500).json({ err: err.message }))
 })
 
-app.get("/ynab/accounts", (req, res) => {
+app.get("/ynab/accounts", async (req, res) => {
   const userId = getUserId(req)
 
   console.debug(`[User] ${userId}`)
 
-  ynab
-    .api(userId)
+  const doc = await findDocument(userId)
+
+  const api = ynab.api(getYnabTokenFn(await ynabAuth, doc))
+
+  api
     .accounts()
     .then((acc) => res.json(acc))
     .catch((err) => res.status(500).json(err))
@@ -155,7 +160,6 @@ app.get("/truelayer/connections", async (req, res) => {
   const userId = getUserId(req)
 
   console.debug(`[User] ${userId}`)
-  const doc = await findDocument(userId)
 
   findDocument(userId)
     .then((doc) => doc.connections)
@@ -164,6 +168,13 @@ app.get("/truelayer/connections", async (req, res) => {
       res.status(500).json({ error: err.message })
     })
 })
+
+const getYnabTokenFn = (authClient: AuthClient, doc: UserDocument) =>
+  getTokenFn(
+    `${doc.user_id}:ynab`,
+    () => authClient.refreshToken(doc.ynab_refresh_token),
+    (refresh_token) => upsert(doc.user_id, { $set: { ynab_refresh_token: refresh_token } })
+  )
 
 app.get("/health", (req, res) => res.status(200).end())
 

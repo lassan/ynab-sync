@@ -51,7 +51,7 @@ export const createAuthClient = async (config: OAuthConfig): Promise<AuthClient>
         grant_type: "authorization_code",
         client_id: config.client_id,
         client_secret: config.client_secret,
-        redirect_uri: "http://localhost:3000/truelayer-redirect",
+        redirect_uri: config.redirect_url,
         code: authCode
       })
       .then(toMinTokenSet)

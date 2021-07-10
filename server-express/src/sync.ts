@@ -9,7 +9,7 @@ import dayjs from "dayjs"
 import type { Account, Connection, UserDocument, YnabTransaction } from "../../libs/src/types"
 import { getTokenFn } from "./getTokenFn"
 
-import { combineLatest, from, of, forkJoin, Observable } from "rxjs"
+import { combineLatest, from, of, forkJoin } from "rxjs"
 
 import { filter, map, mergeMap, tap } from "rxjs/operators"
 import type { Collection } from "../../libs/node_modules/@types/mongodb"
