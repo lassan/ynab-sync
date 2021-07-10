@@ -16,6 +16,8 @@
   import AccountSyncConfiguration from "$lib/AccountSyncConfiguration.svelte"
   import type { Connection, YnabAccount, YnabToBankConnection } from "../../../../libs/src/types"
 
+  import dayjs from "dayjs"
+
   const _throw = (msg: string) => {
     throw new Error(msg)
   }
@@ -52,13 +54,13 @@
     <ul class="space-y-4">
       {#each accounts.connections as connection}
         <li>
-          <pre>
-            {connection.id}
-            {connection.connected_at}
-          </pre>
+          <div class="text-xs">
+            <pre>{connection.id}</pre>
+            <pre>Connected {dayjs().diff(connection.connected_at, "days")} days ago on {dayjs(connection.connected_at).format("YYYY-MM-DD")}</pre>
+          </div>
           <ul
-            class="bg-white shadow-md rounded-b-md grid gap-6 p-4"
-            style="grid-template-columns: auto 1fr auto;"
+            class="bg-white shadow-md rounded-b-md grid gap-6 p-4 items-center"
+            style="grid-template-columns: auto 1fr auto auto;"
           >
             {#each Object.entries(connection.accounts) as account}
               <li class="contents">

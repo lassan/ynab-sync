@@ -5,6 +5,11 @@
     YnabAccount,
     YnabToBankConnection
   } from "../../../libs/src/types"
+
+  import dayjs from "dayjs"
+  import relativeTime from "dayjs/plugin/relativeTime"
+  dayjs.extend(relativeTime)
+
   import { createEventDispatcher } from "svelte"
 
   export let bankAccount: Account
@@ -34,6 +39,7 @@
 </div>
 
 <div>{bankAccount.display_name}</div>
+<div class="text-xs text-gray-500">Synced {dayjs(bankAccount.synced_at).fromNow()}</div>
 <select bind:value={selected}>
   <option value={null} selected={false} disabled />
   {#each ynabAccounts as ynab}
