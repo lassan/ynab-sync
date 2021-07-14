@@ -3,6 +3,8 @@ import * as ynab from "../../libs/src/api/ynab"
 import { connection, upsert } from "../../libs/src/db"
 import { AuthClient, createAuthClient } from "../../libs/src/api/createAuthClient"
 
+import chalk from "chalk"
+
 import { config } from "./config"
 
 import dayjs from "dayjs"
@@ -13,6 +15,9 @@ import { combineLatest, from, of, forkJoin } from "rxjs"
 
 import { filter, map, mergeMap, tap } from "rxjs/operators"
 import type { Collection } from "../../libs/node_modules/@types/mongodb"
+
+const error = chalk.red
+const info = chalk.green
 
 const sync = (
   trueLayerAuth: AuthClient,
@@ -51,10 +56,11 @@ const sync = (
             }, 1),
             tap(([transactions, account]) =>
               console.info(
-                `Received ${transactions.length} transactions for ${
-                  account.provider
-                } / ${account.display_name.trim()}. ` +
-                  `Account was last synced at ${account.synced_at}`
+                info(`Received %d transactions for %s / %s. ` + `Account was last synced at %s`),
+                transactions.length,
+                account.provider,
+                account.display_name.trim(),
+                dayjs(account.synced_at).format("DD/MM/YYYY HH:mm:ss")
               )
             ),
             mergeMap(
@@ -133,7 +139,7 @@ sync$.subscribe({
   next: (account) => console.log(`Completed ${account.provider} / ${account.display_name.trim()}`),
   error: (err) => console.error(err),
   complete: () => {
-    console.log("Processing complete for all documents")
+    console.log(info("Processing complete for all documents"))
     process.exit(0)
   }
 })

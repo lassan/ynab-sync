@@ -20,8 +20,6 @@ const connection = new Promise<mongodb.Db>((resolve, reject) => {
 })
 
 const upsert = async (userId: string, update: UpdateQuery<UserDocument>) => {
-  console.debug("[mongodb] Updating document")
-
   const updateOne = (collection: mongodb.Collection<any>) =>
     promisify<
       mongodb.FilterQuery<UserDocument>,
