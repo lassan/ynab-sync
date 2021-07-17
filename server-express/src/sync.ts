@@ -63,6 +63,7 @@ const sync = (
                 dayjs(account.synced_at).format("DD/MM/YYYY HH:mm:ss")
               )
             ),
+            filter(([transactions]) => transactions.length > 0),
             mergeMap(
               ([transactions, account, toDate]) =>
                 (transactions.length > 0
