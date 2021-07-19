@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "dev": "ts-node-dev src/index.ts",
+    "dev": "ts-node-dev -r dotenv/config src/index.ts",
     "start": "node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "sync": "ts-node src/sync.ts"
@@ -18,8 +18,10 @@
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dayjs": "1.10.6",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "fp-ts": "^2.10.5",
+    "joi": "^17.4.1",
     "mongodb": "3.6.10",
     "morgan": "^1.10.0",
     "openid-client": "4.7.4",
