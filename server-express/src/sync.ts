@@ -138,7 +138,10 @@ const sync$ = forkJoin([
 
 sync$.subscribe({
   next: (account) => console.log(`Completed ${account.provider} / ${account.display_name.trim()}`),
-  error: (err) => console.error(err),
+  error: (err) => {
+    console.error(err)
+    process.exit(1)
+  },
   complete: () => {
     console.log(info("Processing complete for all documents"))
     process.exit(0)

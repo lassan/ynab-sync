@@ -7,7 +7,7 @@
     "dev": "ts-node-dev -r dotenv/config src/index.ts",
     "start": "node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "sync": "ts-node src/sync.ts"
+    "sync": "ts-node -r dotenv/config src/sync.ts"
   },
   "author": "",
   "license": "ISC",
