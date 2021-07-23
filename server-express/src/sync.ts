@@ -44,7 +44,7 @@ const sync = (
           ).pipe(
             mergeMap((account) => {
               console.info(`Processing user '${doc.user_id}', connection '${connection.id}'`)
-              const fromDate = account.synced_at ?? dayjs().subtract(3, "day").toDate()
+              const fromDate = account.synced_at ?? dayjs().subtract(5, "day").toDate()
               const toDate = dayjs().toDate()
 
               const transactions =

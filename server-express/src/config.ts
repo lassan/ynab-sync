@@ -39,7 +39,7 @@ if (result.error) {
   throw result.error
 }
 
-const sandbox = new Boolean(process.env.SANDBOX)
+const sandbox = process.env.SANDBOX === "true"
 const config: Config = {
   ynab: {
     discovery: false,

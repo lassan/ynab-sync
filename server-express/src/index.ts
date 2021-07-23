@@ -50,7 +50,7 @@ app.get("/ynab/authorize", async (req, res) => {
       ynab_refresh_token: tokens.refresh_token
     }
   })
-    .then(() => res.cookie("userId", user.id, { httpOnly: true }).json({ userId: user.id }))
+    .then(() => res.json({ userId: user.id }))
     .catch((err) => res.status(500).json({ err: err.message }))
 })
 

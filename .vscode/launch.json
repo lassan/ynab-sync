@@ -13,6 +13,16 @@
       "runtimeArgs": ["--nolazy", "-r", "ts-node\\register\\transpile-only", "-r", "dotenv/config"],
       "skipFiles": ["<node_internals>/**", "node_modules/**"],
       "args": ["src\\index.ts"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Sync",
+      "runtimeExecutable": "node",
+      "cwd": "${workspaceFolder}\\server-express",
+      "runtimeArgs": ["--nolazy", "-r", "ts-node\\register\\transpile-only", "-r", "dotenv/config"],
+      "skipFiles": ["<node_internals>/**", "node_modules/**"],
+      "args": ["src\\sync.ts"]
     }
   ]
 }
