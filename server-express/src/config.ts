@@ -1,4 +1,7 @@
-import joi, { valid } from "joi"
+import joi from "joi"
+import * as dotenv from "dotenv"
+
+dotenv.config()
 
 type OAuthService = {
   discovery: boolean
