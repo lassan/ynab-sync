@@ -149,6 +149,7 @@ app.get("/truelayer/authorize", async (req, res) => {
       connections: {
         id: uuid(),
         accounts: reduced,
+        type: "truelayer",
         refresh_token: tokens.refresh_token,
         connected_at: dayjs().toDate()
       }

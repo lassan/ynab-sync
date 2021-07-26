@@ -50,6 +50,9 @@ export type Transaction = Readonly<{
   meta: { provider_merchant_name: string }
   amount: number
   currency: string
+  provider_transaction_id?: string
+  version_two_id?: string
+  transaction_id?: string
 }>
 
 type Resource<T> = T
