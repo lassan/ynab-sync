@@ -1,3 +1,4 @@
+import * as ynab from "./api/ynab"
 type AuthDocument = Readonly<{
   refresh_token: string
 }>
@@ -23,22 +24,27 @@ export type VanguardAccount = Readonly<{
   display_name: string
   connected_to?: string
   synced_at?: string
+  sync_period_in_days: number
 }>
 
-export type TrueLayerConnection = Readonly<{
-  type: "truelayer"
-  accounts: Record<string, TrueLayerAccount>
-}>
+type ConnectionBase = Readonly<{ id: string; connected_at: Date }>
 
-export type VanguardConnection = Readonly<{
-  type: "vanguard"
-  accounts: Record<string, VanguardAccount>
-}>
+export type TrueLayerConnection = ConnectionBase &
+  Readonly<{
+    type: "truelayer"
+    refresh_token: string
+    accounts: Record<string, TrueLayerAccount>
+  }>
 
-export type Connection = { id: string; refresh_token: string; connected_at: Date } & (
-  | TrueLayerConnection
-  | VanguardConnection
-)
+export type VanguardConnection = ConnectionBase &
+  Readonly<{
+    type: "vanguard"
+    accounts: Record<string, VanguardAccount>
+    user_name: string
+    password: string
+  }>
+
+export type Connection = TrueLayerConnection | VanguardConnection
 
 export type ConnectionType = "vanguard" | "truelayer"
 
@@ -59,6 +65,8 @@ export type YnabAccount = Readonly<{
   name: string
   type: string
   deleted: boolean
+  cleared_balance: number
+  uncleared_balance: number
 }>
 
 export type BankAccount = Readonly<{
@@ -83,8 +91,13 @@ export type YnabTransaction = Readonly<{
   import_id?: string
 }>
 
+type GetTransactionsToSaveToYnabDependencies = {
+  ynab: ynab.Api
+}
+
 export type GetTransactionsToSaveToYnab = (
   user_id: string,
   connection: Connection,
-  account: Connection["accounts"][0]
+  account: Connection["accounts"][0],
+  deps: GetTransactionsToSaveToYnabDependencies
 ) => Promise<{ toDate: Date; transactions: YnabTransaction[] }>

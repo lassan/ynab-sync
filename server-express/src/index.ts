@@ -5,7 +5,6 @@ import cookie from "cookie"
 import cookieParser from "cookie-parser"
 
 import type { Request } from "express"
-
 import * as ynab from "../../libs/src/api/ynab"
 
 import type { UserDocument, YnabToBankConnection } from "../../libs/src/types"
@@ -18,6 +17,7 @@ import { config } from "./config"
 import { v4 as uuid } from "uuid"
 import dayjs from "dayjs"
 import { getTokenFn } from "./getTokenFn"
+import { encrypt } from "./encrypt"
 
 const truelayerAuth = createAuthClient(config.truelayer)
 const ynabAuth = createAuthClient(config.ynab)
@@ -170,6 +170,41 @@ app.get("/truelayer/connections", async (req, res) => {
     .catch((err) => {
       res.status(500).json({ error: err.message })
     })
+})
+
+type VanguardConnectionRequest = {
+  ynab_account_id: string
+  user_name: string
+  password: string
+}
+
+app.post("/vanguard", (req, res) => {
+  const userId = getUserId(req)
+  console.debug(`[User] ${userId}`)
+
+  const body: VanguardConnectionRequest = req.body
+
+  const accountId = uuid()
+  upsert(userId, {
+    $push: {
+      connections: {
+        id: uuid(),
+        type: "vanguard",
+        user_name: body.user_name,
+        password: encrypt(body.password),
+        connected_at: dayjs().toDate(),
+        accounts: {
+          [accountId]: {
+            display_name: "ISA",
+            provider: "Vanguard",
+            id: accountId,
+            connected_to: body.ynab_account_id,
+            sync_period_in_days: 30
+          }
+        }
+      }
+    }
+  }).then(() => res.status(200).send())
 })
 
 const getYnabTokenFn = (authClient: AuthClient, doc: UserDocument) =>

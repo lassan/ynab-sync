@@ -1,7 +1,7 @@
 import axios from "axios"
 
 import type { YnabTransaction, YnabAccount } from "../types"
-import { authHeader, requestLogger } from "../axios/interceptors"
+import { authHeader, errorLogger, requestLogger } from "../axios/interceptors"
 
 type Response<T> = Readonly<{
   data: T
@@ -11,8 +11,12 @@ type UserResponse = Readonly<{
   user: { id: string }
 }>
 
-export type AccountResponse = Readonly<{
+export type AccountsResponse = Readonly<{
   accounts: YnabAccount[]
+}>
+
+export type AccountResponse = Readonly<{
+  account: YnabAccount
 }>
 
 export type TransactionsRequest = Readonly<{
@@ -25,19 +29,33 @@ const api = (getAccessToken: () => Promise<string>) => {
   })
 
   client.interceptors.request.use(authHeader(getAccessToken))
-  client.interceptors.request.use(requestLogger)
+  client.interceptors.request.use(requestLogger, errorLogger)
 
   const user = () => client.get<Response<UserResponse>>("user").then((r) => r.data.data.user)
 
   const accounts = () =>
     client
-      .get<Response<AccountResponse>>("budgets/default/accounts")
+      .get<Response<AccountsResponse>>("budgets/default/accounts")
       .then((r) => r.data.data.accounts.filter((acc) => !acc.deleted))
 
-  const transactions = (request: TransactionsRequest) =>
-    client.post("budgets/default/transactions", request).then((r) => r.data)
+  const account = (id: string) =>
+    client
+      .get<Response<AccountResponse>>(`budgets/default/accounts/${id}`)
+      .then((r) => r.data.data.account)
 
-  return { user, accounts, transactions }
+  const transactions = (request: TransactionsRequest) =>
+    client
+      .post("budgets/default/transactions", request)
+      .then((r) => r.data)
+      .catch((error) => {
+        console.error(error.response.data)
+        throw error
+      })
+
+  return { user, accounts, transactions, account }
 }
 
+type Api = ReturnType<typeof api>
+
+export type { Api }
 export { api }

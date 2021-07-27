@@ -1,26 +1,24 @@
 import * as truelayer from "../../../libs/src/api/truelayer"
-import { connection as db_connection, upsert } from "../../../libs/src/db"
+import { connection as db_connection } from "../../../libs/src/db"
 import { AuthClient, createAuthClient } from "../../../libs/src/api/createAuthClient"
-
-import chalk from "chalk"
 
 import { config } from "../config"
 
 import dayjs from "dayjs"
 import type {
   TrueLayerAccount,
-  Connection,
   GetTransactionsToSaveToYnab,
   UserDocument,
-  YnabTransaction
+  YnabTransaction,
+  TrueLayerConnection
 } from "../../../libs/src/types"
 import { getTokenFn } from "../getTokenFn"
 
 import type { Collection } from "../../../libs/node_modules/@types/mongodb"
 
-export const getTransactionsFromTruelayer: GetTransactionsToSaveToYnab = (
+export const provider: GetTransactionsToSaveToYnab = (
   user_id,
-  connection,
+  connection: TrueLayerConnection,
   account: TrueLayerAccount
 ) => {
   const sync = (trueLayerAuth: AuthClient, collection: Collection<UserDocument>) => {
@@ -52,7 +50,7 @@ export const getTransactionsFromTruelayer: GetTransactionsToSaveToYnab = (
 const getTruelayerTokenFn = (
   authClient: AuthClient,
   user_id: string,
-  connection: Connection,
+  connection: TrueLayerConnection,
   collection: Collection<UserDocument>
 ) =>
   getTokenFn(
@@ -72,7 +70,7 @@ const toYnabTransaction = (
   tr: truelayer.Transaction,
   account: TrueLayerAccount
 ): YnabTransaction => ({
-  import_id: tr.provider_transaction_id ?? tr.version_two_id ?? tr.transaction_id,
+  import_id: (tr.provider_transaction_id ?? tr.version_two_id ?? tr.transaction_id)?.slice(0, 36),
   account_id: account.connected_to,
   amount: Math.round(tr.amount * 1000) * (account.type == "card" ? -1 : 1),
   cleared: "cleared",

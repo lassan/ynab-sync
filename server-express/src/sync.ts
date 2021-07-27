@@ -1,4 +1,3 @@
-import * as truelayer from "../../libs/src/api/truelayer"
 import * as ynab from "../../libs/src/api/ynab"
 import { connection, upsert } from "../../libs/src/db"
 import { AuthClient, createAuthClient } from "../../libs/src/api/createAuthClient"
@@ -16,12 +15,13 @@ import type {
 } from "../../libs/src/types"
 import { getTokenFn } from "./getTokenFn"
 
-import { combineLatest, from, of, forkJoin, Observable } from "rxjs"
+import { combineLatest, from, of, forkJoin } from "rxjs"
 
-import { connect, filter, map, mergeMap, tap } from "rxjs/operators"
+import { filter, map, mergeMap, tap } from "rxjs/operators"
 import type { Collection } from "../../libs/node_modules/@types/mongodb"
 
-import { getTransactionsFromTruelayer } from "./ynab_transaction_providers/truelayer"
+import { provider as truelayerProvider } from "./ynab_transaction_providers/truelayer"
+import { provider as vanguardProvider } from "./ynab_transaction_providers/vanguard"
 
 type Account = Connection["accounts"][0]
 
@@ -29,11 +29,12 @@ const error = chalk.red
 const info = chalk.green
 
 const transactionProviders: Partial<Record<ConnectionType, GetTransactionsToSaveToYnab>> = {
-  truelayer: getTransactionsFromTruelayer
+  truelayer: truelayerProvider,
+  vanguard: vanguardProvider
 }
 
-const sync = (ynabAuth: AuthClient, collection: Collection<UserDocument>) => {
-  return from(collection.find<UserDocument>(null, {})).pipe(
+const sync = (ynabAuth: AuthClient, collection: Collection<UserDocument>) =>
+  from(collection.find<UserDocument>(null, {})).pipe(
     filter((doc) => doc.user_id !== null),
     map((doc) => ({ doc, ynab: ynab.api(getYnabTokenFn(ynabAuth, doc)) })),
     mergeMap(({ doc, ynab }) =>
@@ -50,7 +51,7 @@ const sync = (ynabAuth: AuthClient, collection: Collection<UserDocument>) => {
               const provider = transactionProviders[connection.type]
               if (!provider) throw Error(`No provider for connection of type '${connection.type}'`)
 
-              const transactions = provider(doc.user_id, connection, account)
+              const transactions = provider(doc.user_id, connection, account, { ynab })
 
               return combineLatest([transactions, of(account)])
             }, 1),
@@ -60,31 +61,32 @@ const sync = (ynabAuth: AuthClient, collection: Collection<UserDocument>) => {
                 transactions.length,
                 account.provider,
                 account.display_name.trim(),
-                dayjs(account.synced_at).format("DD/MM/YYYY HH:mm:ss")
+                account.synced_at ? dayjs(account.synced_at).format("DD/MM/YYYY HH:mm:ss") : "NEVER"
               )
             ),
             filter(([{ transactions }]) => transactions.length > 0),
-            mergeMap(([{ toDate, transactions }, account]) => {
-              return ynab.transactions({ transactions }).then(
-                () =>
-                  new Promise<Account>((resolve, reject) => {
-                    collection.updateOne(
-                      { $and: [{ user_id: doc.user_id }, { "connections.id": connection.id }] },
-                      { $set: { [`connections.$.accounts.${account.id}.synced_at`]: toDate } },
-                      (err) => {
-                        if (err) reject(err)
-                        else resolve(account)
-                      }
-                    )
-                  })
-              )
-            }, 1)
+            mergeMap(
+              ([{ toDate, transactions }, account]) =>
+                ynab.transactions({ transactions }).then(
+                  () =>
+                    new Promise<Account>((resolve, reject) => {
+                      collection.updateOne(
+                        { $and: [{ user_id: doc.user_id }, { "connections.id": connection.id }] },
+                        { $set: { [`connections.$.accounts.${account.id}.synced_at`]: toDate } },
+                        (err) => {
+                          if (err) reject(err)
+                          else resolve(account)
+                        }
+                      )
+                    })
+                ),
+              1
+            )
           )
         )
       )
     )
   )
-}
 
 const getYnabTokenFn = (authClient: AuthClient, doc: UserDocument) =>
   getTokenFn(
