@@ -1,4 +1,5 @@
 import * as ynab from "./api/ynab"
+
 type AuthDocument = Readonly<{
   refresh_token: string
 }>
@@ -16,6 +17,7 @@ export type TrueLayerAccount = Readonly<{
   provider: string
   connected_to?: string
   synced_at?: Date
+  pending_synced_at?: Date
 }>
 
 export type VanguardAccount = Readonly<{
@@ -100,4 +102,26 @@ export type GetTransactionsToSaveToYnab = (
   connection: Connection,
   account: Connection["accounts"][0],
   deps: GetTransactionsToSaveToYnabDependencies
-) => Promise<{ toDate: Date; transactions: YnabTransaction[] }>
+) => Promise<TransactionsToSaveToYnab>
+
+export type TransactionsToSaveToYnab =
+  | VanguardTransactionsToSaveToYnab
+  | TrueLayerTransactionsToSaveToYnab
+
+export type TransactionFetchResult = {
+  fromDate: Date
+  toDate: Date
+  transactions: YnabTransaction[]
+}
+export type VanguardTransactionsToSaveToYnab = {
+  type: "vanguard"
+  fromDate: Date
+  toDate: Date
+  transactions: YnabTransaction[]
+}
+
+export type TrueLayerTransactionsToSaveToYnab = {
+  type: "truelayer"
+  cleared: TransactionFetchResult
+  pending: TransactionFetchResult
+}

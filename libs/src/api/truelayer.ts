@@ -47,11 +47,11 @@ export type Transaction = Readonly<{
   transaction_category: string
   transaction_classification: string[]
   merchant_name: string
-  meta: { provider_merchant_name: string }
+  meta: { provider_merchant_name: string; transaction_time?: Date; provider_reference?: string }
   amount: number
   currency: string
+  normalised_provider_transaction_id?: string
   provider_transaction_id?: string
-  version_two_id?: string
   transaction_id?: string
 }>
 
@@ -60,11 +60,13 @@ type Resource<T> = T
 type AccountResource = {
   accounts: () => Promise<BankAccount[]>
   transactions: (accountId: string, from?: Date, to?: Date) => Promise<Transaction[]>
+  transactionsPending: (accountId: string, from?: Date, to?: Date) => Promise<Transaction[]>
 }
 
 type CardsResource = {
   cards: () => Promise<BankAccount[]>
   transactions: (cardId: string, from?: Date, to?: Date) => Promise<Transaction[]>
+  transactionsPending: (cardId: string, from?: Date, to?: Date) => Promise<Transaction[]>
 }
 
 type CreateResource<T> = (client: AxiosInstance) => Resource<T>
@@ -90,7 +92,18 @@ export const accountsResource: CreateResource<AccountResource> = (client) => {
         throw r
       })
 
-  return { accounts, transactions }
+  const transactionsPending = (accountId: string, from?: Date, to?: Date) =>
+    client
+      .get<Response<Transaction[]>>(`accounts/${accountId}/transactions/pending`, {
+        params: { from, to }
+      })
+      .then((r) => r.data)
+      .then((r) => {
+        if (r.status === "Succeeded") return r.results
+        throw r
+      })
+
+  return { accounts, transactions, transactionsPending }
 }
 
 export const cardsResource: CreateResource<CardsResource> = (client) => {
@@ -114,10 +127,21 @@ export const cardsResource: CreateResource<CardsResource> = (client) => {
         throw r
       })
 
-  return { cards, transactions }
+  const transactionsPending = (cardId: string, from?: Date, to?: Date) =>
+    client
+      .get<Response<Transaction[]>>(`cards/${cardId}/transactions/pending`, {
+        params: { from, to }
+      })
+      .then((r) => r.data)
+      .then((r) => {
+        if (r.status === "Succeeded") return r.results
+        throw r
+      })
+
+  return { cards, transactions, transactionsPending }
 }
 
-type Api = {
+export type Api = {
   accounts: AccountResource
   cards: CardsResource
 }

@@ -4,7 +4,8 @@ import { config } from "dotenv"
 import type {
   GetTransactionsToSaveToYnab,
   VanguardAccount,
-  VanguardConnection
+  VanguardConnection,
+  VanguardTransactionsToSaveToYnab
 } from "../../../libs/src/types"
 import dayjs from "dayjs"
 import { decrypt } from "../encrypt"
@@ -45,8 +46,9 @@ export const provider: GetTransactionsToSaveToYnab = async (
     : dayjs().diff(dayjs(account.synced_at), "days") > account.sync_period_in_days
 
   const toDate = dayjs().toDate()
+  const fromDate = dayjs().toDate() // todo
 
-  if (!shouldSync) return { toDate, transactions: [] }
+  if (!shouldSync) return { type: "vanguard", toDate, fromDate, transactions: [] }
 
   const [ynabValue, vanguardValue] = await Promise.all([
     ynab.account(account.connected_to).then((x) => x.cleared_balance + x.uncleared_balance),
@@ -56,6 +58,8 @@ export const provider: GetTransactionsToSaveToYnab = async (
   ])
 
   return {
+    type: "vanguard",
+    fromDate,
     toDate,
     transactions: [
       {

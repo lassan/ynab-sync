@@ -57,5 +57,15 @@ const api = (getAccessToken: () => Promise<string>) => {
 
 type Api = ReturnType<typeof api>
 
+const mockApi: typeof api = (t: () => Promise<string>) => {
+  return {
+    user: () => Promise.resolve({ id: "" }),
+    account: () => Promise.resolve({} as any),
+    accounts: () => Promise.resolve([]),
+    transactions: () => Promise.resolve([])
+  }
+}
+
 export type { Api }
 export { api }
+// export { mockApi as api }

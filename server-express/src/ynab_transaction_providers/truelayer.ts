@@ -15,36 +15,91 @@ import type {
 import { getTokenFn } from "../getTokenFn"
 
 import type { Collection } from "../../../libs/node_modules/@types/mongodb"
+import type { Api } from "../../../libs/src/api/truelayer"
 
-export const provider: GetTransactionsToSaveToYnab = (
+export const provider: GetTransactionsToSaveToYnab = async (
   user_id,
   connection: TrueLayerConnection,
   account: TrueLayerAccount
 ) => {
-  const sync = (trueLayerAuth: AuthClient, collection: Collection<UserDocument>) => {
+  const getClearedTransactions = (
+    trueLayerAuth: AuthClient,
+    collection: Collection<UserDocument>
+  ) => {
     const truelayerApi = truelayer.api(
       config.truelayer.base_url,
       getTruelayerTokenFn(trueLayerAuth, user_id, connection, collection)
     )
 
+    // cleared
+    // const fromDate = dayjs().subtract(5, "day").toDate()
     const fromDate = account.synced_at ?? dayjs().subtract(5, "day").toDate()
     const toDate = dayjs().toDate()
 
     const transactions =
-      account.type == "card"
+      account.type === "card"
         ? truelayerApi.cards.transactions(account.id, fromDate, toDate)
         : truelayerApi.accounts.transactions(account.id, fromDate, toDate)
 
-    return transactions.then((trs) => ({
-      toDate,
-      transactions: trs.map((tr) => toYnabTransaction(tr, account))
-    }))
+    return transactions.then((trs) => {
+      // console.log("cleared")
+      // console.log(JSON.stringify(trs, null, 2))
+      return {
+        toDate,
+        fromDate,
+        transactions: trs.map((tr) => toYnabTransaction(tr, account, "cleared"))
+      }
+    })
   }
 
-  return Promise.all([
+  const getPendingTransactions = (
+    trueLayerAuth: AuthClient,
+    collection: Collection<UserDocument>
+  ) => {
+    const truelayerApi = truelayer.api(
+      config.truelayer.base_url,
+      getTruelayerTokenFn(trueLayerAuth, user_id, connection, collection)
+    )
+
+    // cleared
+    // const fromDate = dayjs().subtract(5, "day").toDate()
+    const fromDate = account.pending_synced_at ?? dayjs().subtract(5, "day").toDate()
+    const toDate = dayjs().toDate()
+
+    const transactions =
+      account.type === "card"
+        ? truelayerApi.cards.transactionsPending(account.id, fromDate, toDate)
+        : truelayerApi.accounts.transactionsPending(account.id, fromDate, toDate)
+
+    return transactions
+      .then((trs) => {
+        // console.log("uncleared")
+        // console.log(JSON.stringify(trs, null, 2))
+        return {
+          toDate,
+          fromDate,
+          transactions: trs.map((tr) => toYnabTransaction(tr, account, "uncleared"))
+        }
+      })
+      .catch(() => {
+        console.error("Failed to get pending transactions")
+        return {
+          toDate,
+          fromDate,
+          transactions: []
+        }
+      })
+  }
+
+  const [auth, collection_2] = await Promise.all([
     createAuthClient(config.truelayer),
     db_connection.then((db) => db.collection("data"))
-  ]).then(([auth, collection]) => sync(auth, collection))
+  ])
+
+  const cleared = await getClearedTransactions(auth, collection_2)
+  const pending = await getPendingTransactions(auth, collection_2)
+
+  return { type: "truelayer", cleared, pending }
 }
 
 const getTruelayerTokenFn = (
@@ -68,15 +123,31 @@ const getTruelayerTokenFn = (
 
 const toYnabTransaction = (
   tr: truelayer.Transaction,
-  account: TrueLayerAccount
+  account: TrueLayerAccount,
+  cleared: YnabTransaction["cleared"]
 ): YnabTransaction => ({
-  import_id: (tr.provider_transaction_id ?? tr.version_two_id ?? tr.transaction_id)?.slice(0, 36),
+  import_id: id(tr),
   account_id: account.connected_to,
   amount: Math.round(tr.amount * 1000) * (account.type == "card" ? -1 : 1),
-  cleared: "cleared",
+  cleared: cleared,
   payee_name: payee(tr),
-  date: tr.timestamp
+  memo: tr.description,
+  date: date(tr) //tr.meta?.transaction_time ?? tr.timestamp
 })
 
 const payee = (tr: truelayer.Transaction) =>
   (tr.merchant_name ?? tr.meta?.provider_merchant_name ?? tr.description ?? "").slice(0, 99)
+
+const id = (tr: truelayer.Transaction) =>
+  (
+    tr.normalised_provider_transaction_id ??
+    tr.meta?.provider_reference ??
+    tr.transaction_id ??
+    ""
+  ).slice(0, 36)
+
+const date = (tr: truelayer.Transaction) => {
+  const d = tr.meta?.transaction_time ?? tr.timestamp
+  const now = dayjs()
+  return dayjs(d) > now ? now.toDate() : d
+}
