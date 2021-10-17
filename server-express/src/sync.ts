@@ -12,15 +12,13 @@ import type {
   ConnectionType,
   GetTransactionsToSaveToYnab,
   TransactionFetchResult,
-  TransactionsToSaveToYnab,
   TrueLayerTransactionsToSaveToYnab,
   UserDocument,
-  VanguardTransactionsToSaveToYnab,
-  YnabAccount
+  VanguardTransactionsToSaveToYnab
 } from "../../libs/src/types"
 import { getTokenFn } from "./getTokenFn"
 
-import { combineLatest, from, of, forkJoin, take, iif, pipe, Observable, concat } from "rxjs"
+import { combineLatest, from, of, forkJoin, iif, Observable, concat } from "rxjs"
 
 import { filter, map, mergeMap, tap, concatMap, skip } from "rxjs/operators"
 import type { Collection } from "../../libs/node_modules/@types/mongodb"
@@ -28,7 +26,6 @@ import type { Collection } from "../../libs/node_modules/@types/mongodb"
 import { provider as truelayerProvider } from "./ynab_transaction_providers/truelayer"
 import { provider as vanguardProvider } from "./ynab_transaction_providers/vanguard"
 import type { FilterQuery, UpdateQuery } from "mongodb"
-import type { updateAt } from "fp-ts/lib/ReadonlyRecord"
 
 type Account = Connection["accounts"][0]
 
@@ -97,8 +94,7 @@ const sync = (ynabAuth: AuthClient, collection: Collection<UserDocument>) => {
                 }
               }
             )
-          ),
-          tap((args) => console.info("completed cleared account", args.provider, args.display_name))
+          )
         )
         const b = createYnabTransactions$(ynab, result.pending).pipe(
           mergeMap(() =>
@@ -111,9 +107,6 @@ const sync = (ynabAuth: AuthClient, collection: Collection<UserDocument>) => {
                 }
               }
             )
-          ),
-          tap((args) =>
-            console.info("completed  uncleared account", args.provider, args.display_name)
           )
         )
         return concat(a, b).pipe(map(() => account))
@@ -150,6 +143,7 @@ const sync = (ynabAuth: AuthClient, collection: Collection<UserDocument>) => {
   }
 
   return from(collection.find<UserDocument>(null, {})).pipe(
+    // skip(1),
     filter((doc) => doc.user_id !== null),
     map((doc) => ({ doc, ynab: ynab.api(getYnabTokenFn(ynabAuth, doc)) })),
     mergeMap(({ doc, ynab }) =>

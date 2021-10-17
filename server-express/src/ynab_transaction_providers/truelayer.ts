@@ -131,7 +131,7 @@ const toYnabTransaction = (
   amount: Math.round(tr.amount * 1000) * (account.type == "card" ? -1 : 1),
   cleared: cleared,
   payee_name: payee(tr),
-  memo: tr.description,
+  memo: "",
   date: date(tr) //tr.meta?.transaction_time ?? tr.timestamp
 })
 
